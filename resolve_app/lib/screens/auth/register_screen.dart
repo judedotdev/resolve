@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:resolve_app/services/auth_service.dart';
 
 class RegistrationScreen extends StatefulWidget {
@@ -15,6 +16,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
+  Future<bool> _isNetworkConnected() async {
+    try {
+      final response = await http.get(Uri.parse('https://www.google.com'));
+
+      // If the response status is OK, then internet is available
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
   bool passwordsMatch(Map<String, String> formData) {
     return formData['password']?.isNotEmpty == true &&
         formData['confirmPassword']?.isNotEmpty == true &&
@@ -27,8 +39,25 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       _errorMessage = null;
     });
 
-    _formData.remove('confirmPassword');
+    // Check network connectivity
+    final isConnected = await _isNetworkConnected();
+    if (!isConnected && context.mounted) {
+      setState(() {
+        _isLoading = false;
+      });
 
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              const Text("No internet connection. Please check your network."),
+          backgroundColor: Colors.orange,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+      return;
+    }
+
+    // Attempt register
     final result = await _authService.register(_formData);
 
     setState(() {
@@ -41,6 +70,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       setState(() {
         _errorMessage = result['message'];
       });
+
+      // Show the error message in a SnackBar
+      if (_errorMessage != null && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_errorMessage!),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
     }
   }
 
@@ -78,11 +118,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    if (_errorMessage != null)
-                      Text(
-                        _errorMessage!,
-                        style: const TextStyle(color: Colors.red),
-                      ),
                     TextFormField(
                       onChanged: (value) => _formData['fullName'] = value,
                       decoration: const InputDecoration(

@@ -17,12 +17,16 @@ class AuthService {
       }),
     );
 
+    final data = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
       await _storage.write(key: 'token', value: data['token']);
-      return {"success": true, "token": data['token']};
+      return {
+        "success": true,
+        "token": data['token'],
+        "message": data['message']
+      };
     } else {
-      return {"success": false, "message": jsonDecode(response.body)['error']};
+      return {"success": false, "message": data['message']};
     }
   }
 
@@ -33,10 +37,11 @@ class AuthService {
       body: jsonEncode(userData),
     );
 
+    final data = jsonDecode(response.body);
     if (response.statusCode == 201) {
-      return {"success": true, "message": jsonDecode(response.body)['message']};
+      return {"success": true, "message": data['message']};
     } else {
-      return {"success": false, "message": jsonDecode(response.body)['error']};
+      return {"success": false, "message": data['message']};
     }
   }
 

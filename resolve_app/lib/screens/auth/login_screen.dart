@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:resolve_app/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -16,12 +17,42 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
+  Future<bool> _isNetworkConnected() async {
+    try {
+      final response = await http.get(Uri.parse('https://www.google.com'));
+
+      // If the response status is OK, then internet is available
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
   void _login(BuildContext context) async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
+    // Check network connectivity
+    final isConnected = await _isNetworkConnected();
+    if (!isConnected && context.mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              const Text("No internet connection. Please check your network."),
+          backgroundColor: Colors.orange,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+      return;
+    }
+
+    // Attempt login
     final result = await _authService.login(
       _emailController.text,
       _passwordController.text,
@@ -37,6 +68,17 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         _errorMessage = result['message'];
       });
+
+      // Show the error message in a SnackBar
+      if (_errorMessage != null && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_errorMessage!),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
     }
   }
 
@@ -74,11 +116,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    if (_errorMessage != null)
-                      Text(
-                        _errorMessage!,
-                        style: const TextStyle(color: Colors.red),
-                      ),
                     TextFormField(
                       controller: _emailController,
                       decoration: const InputDecoration(

@@ -40,23 +40,23 @@ class NavigationBar extends StatelessWidget {
         // Handle navigation
         switch (index) {
           case 0:
-            Navigator.pushReplacement(
+            Navigator.push(
                 context, MaterialPageRoute(builder: (_) => HomeScreen()));
             break;
           case 1:
-            Navigator.pushReplacement(
+            Navigator.push(
                 context, MaterialPageRoute(builder: (_) => SideNavigation()));
             break;
           case 2:
-            Navigator.pushReplacement(context,
+            Navigator.push(context,
                 MaterialPageRoute(builder: (_) => SubmitProblemScreen()));
             break;
           case 3:
-            Navigator.pushReplacement(
+            Navigator.push(
                 context, MaterialPageRoute(builder: (_) => HackathonsScreen()));
             break;
           case 4:
-            Navigator.pushReplacement(
+            Navigator.push(
                 context, MaterialPageRoute(builder: (_) => ProfileScreen()));
             break;
         }
