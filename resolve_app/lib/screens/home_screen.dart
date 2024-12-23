@@ -1,3 +1,4 @@
+// home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:resolve_app/screens/hackathons_screen.dart';
@@ -18,88 +19,92 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userName = Provider.of<UserProvider>(context).userName;
+    final firstName = Provider.of<UserProvider>(context).firstName;
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.person),
-                  color: Colors.black,
-                ),
-                Center(
-                  child: Text(
-                    'Welcome, $userName!',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.person),
+                    color: Colors.black,
+                  ),
+                  Center(
+                    child: Text(
+                      'Welcome, $firstName!',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.notifications_none),
-                  color: Colors.black,
-                  onPressed: () {
-                    // Navigate to notifications
-                  },
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Community Engagement',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+                  IconButton(
+                    icon: Icon(Icons.notifications_none),
+                    color: Colors.black,
+                    onPressed: () {
+                      // Navigate to notifications
+                    },
+                  ),
+                ],
               ),
             ),
-          ),
-          CommunityEngagementCarousel(),
-          SizedBox(height: 20),
-          Expanded(
-            child: GridView.count(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              crossAxisCount: 3,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              children: [
-                _buildMenuCard(context, 'About Us', Icons.info, () {
-                  // navigateTo(context, AboutUsScreen());
-                }),
-                _buildMenuCard(context, 'Submit a Problem', Icons.add_box, () {
-                  navigateTo(context, SubmitProblemScreen());
-                }),
-                _buildMenuCard(context, 'Hackathons', Icons.event, () {
-                  navigateTo(context, HackathonsScreen());
-                }),
-                _buildMenuCard(context, 'Community Feedback', Icons.feedback,
-                    () {
-                  // navigateTo(context, CommunityFeedbackScreen());
-                }),
-                _buildMenuCard(context, 'News & Updates', Icons.newspaper, () {
-                  // navigateTo(context, NewsAndUpdatesScreen());
-                }),
-                _buildMenuCard(context, 'Get Involved', Icons.group, () {
-                  // navigateTo(context, GetInvolvedScreen());
-                }),
-                _buildMenuCard(context, 'More', Icons.more_horiz, () {
-                  // navigateTo(context, MoreScreen());
-                }),
-              ],
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Community Engagement',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
-          ),
-        ],
+            CommunityEngagementCarousel(),
+            SizedBox(height: 20),
+            Expanded(
+              child: GridView.count(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                crossAxisCount: 3,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                children: [
+                  _buildMenuCard(context, 'About Us', Icons.info, () {
+                    // navigateTo(context, AboutUsScreen());
+                  }),
+                  _buildMenuCard(context, 'Submit a Problem', Icons.add_box,
+                      () {
+                    navigateTo(context, SubmitProblemScreen());
+                  }),
+                  _buildMenuCard(context, 'Hackathons', Icons.event, () {
+                    navigateTo(context, HackathonsScreen());
+                  }),
+                  _buildMenuCard(context, 'Community Feedback', Icons.feedback,
+                      () {
+                    // navigateTo(context, CommunityFeedbackScreen());
+                  }),
+                  _buildMenuCard(context, 'News & Updates', Icons.newspaper,
+                      () {
+                    // navigateTo(context, NewsAndUpdatesScreen());
+                  }),
+                  _buildMenuCard(context, 'Get Involved', Icons.group, () {
+                    // navigateTo(context, GetInvolvedScreen());
+                  }),
+                  _buildMenuCard(context, 'More', Icons.more_horiz, () {
+                    // navigateTo(context, MoreScreen());
+                  }),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: custom.NavigationBar(),
     );

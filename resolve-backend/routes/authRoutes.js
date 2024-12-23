@@ -16,10 +16,10 @@ router.use(rateLimiter);
 
 // Register a new user
 router.post('/register', async (req, res) => {
-    const { fullName, email, phone, username, password } = req.body;
+    const { firstName, lastName, email, phone, username, password } = req.body;
 
     // Validate input
-    if (!fullName || !email || !phone || !username || !password) {
+    if (!firstName || lastName || !email || !phone || !username || !password) {
         return res.status(400).json({ message: 'Please fill in all fields' });
     }
 
@@ -34,7 +34,7 @@ router.post('/register', async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await User.create({ fullName, email, phone, username, password: hashedPassword });
+        const user = await User.create({ firstName, lastName, email, phone, username, password: hashedPassword });
         const token = generateToken(user._id);
         res.status(201).json({ message: 'User registered successfully', token, userId: user._id, });
     } catch (err) {

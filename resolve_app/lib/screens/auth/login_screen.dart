@@ -1,6 +1,9 @@
+// login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:resolve_app/services/auth_service.dart';
+import 'package:resolve_app/providers/user_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -63,6 +66,18 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     if (result['success'] && context.mounted) {
+      // Update UserProvider with user data
+      final user = result['user'];
+      final userName = user['username'];
+      final firstName = user['firstName'];
+      final lastName = user['lastName'];
+      final email = user['email'];
+      final phone = user['phone'];
+
+      // Set the user info in UserProvider
+      Provider.of<UserProvider>(context, listen: false)
+          .setUserInfo(userName, firstName, lastName, email, phone);
+
       Navigator.pushReplacementNamed(context, '/home'); // Navigate to Home
     } else {
       setState(() {

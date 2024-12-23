@@ -119,9 +119,23 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 child: Column(
                   children: [
                     TextFormField(
-                      onChanged: (value) => _formData['fullName'] = value,
+                      onChanged: (value) => _formData['firstName'] = value,
                       decoration: const InputDecoration(
-                        labelText: 'Full Name',
+                        labelText: 'First Name',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'This field is required';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 15),
+                    TextFormField(
+                      onChanged: (value) => _formData['lastName'] = value,
+                      decoration: const InputDecoration(
+                        labelText: 'Last Name',
                         border: OutlineInputBorder(),
                       ),
                       validator: (value) {
