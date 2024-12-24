@@ -6,3 +6,4 @@ This repository contains the source code for the resolve flutter application fro
 
 - Frontend: [resolve_app](./resolve_app/)
 - Backend: [resolve-backend](./resolve-backend/)
+- Pitch Deck: [Resolve Technologies Pitch Deck](./Resolve_Technologies_Pitch_Deck.pdf)
