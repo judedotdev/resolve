@@ -32,7 +32,7 @@ app.use(rateLimiter);
 connectDB();
 
 // Create the 'uploads' directory if it doesn't exist
-const uploadDir = path.join(__dirname, 'uploads');
+const uploadDir = path.join('/tmp', 'uploads');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir);
 }
