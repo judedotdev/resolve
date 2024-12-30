@@ -1,6 +1,4 @@
 {
-    "installCommand": "npm install",
-    "name": "resolve-api",
     "version": 2,
     "builds": [
         {
