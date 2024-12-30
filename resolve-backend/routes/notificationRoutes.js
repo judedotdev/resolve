@@ -1,4 +1,4 @@
-// routes/notificationRoutes.js
+// ./routes/notificationRoutes.js
 import express from 'express';
 import { authenticate, protect } from '../middlewares/authMiddleware.js';
 import Notification from '../models/Notification.js';

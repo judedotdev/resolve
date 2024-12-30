@@ -4,7 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthService {
-  static const String _baseUrl = 'https://resolve-api.onrender.com/api';
+  // static const String _baseUrl = 'http://localhost:5000/api'; // dev
+  static const String _baseUrl = 'https://resolve-api.onrender.com/api'; // prod
   final _storage = const FlutterSecureStorage();
 
   Future<Map<String, dynamic>> register(Map<String, String> userData) async {
@@ -82,5 +83,33 @@ class AuthService {
 
   Future<void> logout() async {
     await _storage.delete(key: 'token');
+  }
+
+  // function to submit a problem
+  Future<Map<String, dynamic>> submitProblem(
+      Map<String, dynamic> problemData) async {
+    final token = await _storage.read(key: 'token');
+    if (token == null) {
+      return {"success": false, "message": "User not authenticated"};
+    }
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/problems'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(problemData),
+    );
+
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 201) {
+      return {"success": true, "data": data};
+    } else {
+      return {
+        "success": false,
+        "message": data['message'] ?? 'Submission failed'
+      };
+    }
   }
 }

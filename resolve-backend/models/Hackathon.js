@@ -1,4 +1,4 @@
-// models/Hackathon.js
+// ./models/Hackathon.js
 import mongoose from 'mongoose';
 
 const hackathonSchema = new mongoose.Schema({

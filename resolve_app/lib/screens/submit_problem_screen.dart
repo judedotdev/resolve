@@ -1,4 +1,7 @@
+// submit_problem_screen.dart
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:resolve_app/services/auth_service.dart';
 
 class SubmitProblemScreen extends StatefulWidget {
   const SubmitProblemScreen({super.key});
@@ -18,31 +21,115 @@ class _SubmitProblemScreenState extends State<SubmitProblemScreen> {
       TextEditingController();
   final TextEditingController _proposedSolutionController =
       TextEditingController();
-  final TextEditingController _technologyRoleController =
-      TextEditingController();
   final TextEditingController _surveyAnswersController =
       TextEditingController();
 
-  bool _technologyCanHelp = false;
   bool _allowContact = false;
   bool _makePublic = false;
 
   // Dropdown options
-  String? _selectedCategory;
-  final List<String> _categories = [
-    'Health',
-    'Environment',
-    'Education',
-    'Infrastructure',
-    'Technology',
-  ];
-
   String? _selectedIncentive;
   final List<String> _incentives = [
     'Cash prizes',
     'Community recognition',
     'Skill-building opportunities',
   ];
+
+  final AuthService _authService = AuthService(); // Instance of AuthService
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  // function to Check network connectivity (prod)
+  Future<bool> _isNetworkConnected() async {
+    try {
+      final response = await http.get(Uri.parse('https://www.google.com'));
+
+      // If the response status is OK, then internet is available
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  void _submitProblem(BuildContext context) async {
+    final problemData = {
+      "title": _problemTitleController.text,
+      "problemDescription": _problemDescriptionController.text,
+      "impactDescription": _impactDescriptionController.text,
+      "suggestedSolution": _proposedSolutionController.text,
+      "selectedIncentive": _selectedIncentive,
+      "extraInfo": _surveyAnswersController.text,
+      "allowContact": _allowContact,
+      "makePublic": _makePublic,
+    };
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    // Check network connectivity: comment this block if you used dev `_baseUrl`
+    final isConnected = await _isNetworkConnected();
+    if (!isConnected && context.mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              const Text("No internet connection. Please check your network."),
+          backgroundColor: Colors.orange,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+      return;
+    }
+    // END Check network connectivity
+
+    // Attempt to submit problem
+    final response = await _authService.submitProblem(problemData);
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (response["success"] == true && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Problem submitted successfully!'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+      _formKey.currentState!.reset();
+      _problemTitleController.clear();
+      _problemDescriptionController.clear();
+      _impactDescriptionController.clear();
+      _proposedSolutionController.clear();
+      _surveyAnswersController.clear();
+      setState(() {
+        _selectedIncentive = null;
+        _allowContact = false;
+        _makePublic = false;
+      });
+    } else {
+      setState(() {
+        _errorMessage = response['message'];
+      });
+
+      // Show the error message in a SnackBar
+      if (_errorMessage != null && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Submission failed: ${_errorMessage!}'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
+    }
+  }
 
   // Helper method for survey questions
   Widget _buildSurveyQuestion(
@@ -90,11 +177,16 @@ class _SubmitProblemScreenState extends State<SubmitProblemScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Problem Title
+                Text(
+                  'Problem Title:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
                 TextFormField(
                   controller: _problemTitleController,
                   decoration: InputDecoration(
-                    labelText: 'Problem Title',
                     border: OutlineInputBorder(),
+                    hintText: 'e.g: Smart Waste Management',
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -106,11 +198,17 @@ class _SubmitProblemScreenState extends State<SubmitProblemScreen> {
                 SizedBox(height: 16),
 
                 // Problem Description
+                Text(
+                  'Problem Description:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
                 TextFormField(
                   controller: _problemDescriptionController,
                   maxLines: 4,
                   decoration: InputDecoration(
-                    labelText: 'Problem Description',
+                    hintText:
+                        'What is that challenge in your community that you feel needs immediate attention?',
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
@@ -123,11 +221,17 @@ class _SubmitProblemScreenState extends State<SubmitProblemScreen> {
                 SizedBox(height: 16),
 
                 // Impact Description
+                Text(
+                  'How does this problem impact your community?',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
                 TextFormField(
                   controller: _impactDescriptionController,
                   maxLines: 4,
                   decoration: InputDecoration(
-                    labelText: 'How does this problem impact your community?',
+                    hintText:
+                        'How have these challenges affected your daily life or the well-being of others in your community?',
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
@@ -140,68 +244,31 @@ class _SubmitProblemScreenState extends State<SubmitProblemScreen> {
                 SizedBox(height: 16),
 
                 // Proposed Solution
+                Text(
+                  'Proposed Solution (Optional)',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
                 TextFormField(
                   controller: _proposedSolutionController,
                   maxLines: 3,
                   decoration: InputDecoration(
-                    labelText: 'Proposed Solution (Optional)',
+                    hintText:
+                        'If you could propose a solution to this problem in your community, what would it be, and why?',
                     border: OutlineInputBorder(),
                   ),
                 ),
-                SizedBox(height: 16),
-
-                // Category Dropdown
-                DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    labelText: 'Category',
-                    border: OutlineInputBorder(),
-                  ),
-                  value: _selectedCategory,
-                  items: _categories.map((category) {
-                    return DropdownMenuItem(
-                      value: category,
-                      child: Text(category),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedCategory = value;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select a category';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 16),
-
-                // Can Technology Help Toggle
-                SwitchListTile(
-                  title: Text('Can Technology Solve This Problem?'),
-                  value: _technologyCanHelp,
-                  onChanged: (value) {
-                    setState(() {
-                      _technologyCanHelp = value;
-                    });
-                  },
-                ),
-                if (_technologyCanHelp)
-                  TextFormField(
-                    controller: _technologyRoleController,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                      labelText: 'How can technology help?',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
                 SizedBox(height: 16),
 
                 // Incentive Dropdown
+                Text(
+                  'What types of incentives would encourage you to participate in solving community problems?',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
                 DropdownButtonFormField<String>(
                   decoration: InputDecoration(
-                    labelText: 'What Incentive Encourages You?',
+                    hintText: 'What Incentive Encourages You?',
                     border: OutlineInputBorder(),
                   ),
                   value: _selectedIncentive,
@@ -220,30 +287,14 @@ class _SubmitProblemScreenState extends State<SubmitProblemScreen> {
                 SizedBox(height: 16),
 
                 // Survey Questions
-                ...[
-                  'What are the most pressing challenges in your community that you feel need immediate attention?',
-                  'How have these challenges affected your daily life or the well-being of others in your community?',
-                  'If you could propose a solution to one major problem in your community, what would it be, and why?',
-                  'Do you believe technology can play a significant role in solving these challenges? Why or why not?',
-                  'Have you ever participated in a hackathon or similar collaborative problem-solving event? If yes, what was your experience?',
-                  'What features would make a mobile app most effective for identifying and solving community problems?',
-                  'What motivates you to contribute to community problem-solving?',
-                  'How likely are you to use an app that connects individuals to collaboratively solve problems in their communities?',
-                  'What types of incentives would encourage you to participate in solving community problems?',
-                  'Which age group do you belong to?',
-                  'What is your gender?',
-                  'What is your current occupation or primary activity?',
-                  'What do you think makes an idea or solution innovative and impactful?',
-                  'Are there specific challenges in your community that you feel only a collaborative platform like SolveIT Labs can address?',
-                  'Is there anything else you’d like to share about your vision for how SolveIT Labs can make a positive impact in your community?'
-                ].map((question) {
-                  return _buildSurveyQuestion(
-                      question, _surveyAnswersController);
-                }),
+                _buildSurveyQuestion(
+                  "Is there anything else you'd like to share about your vision for how Resolve Tech can make a positive impact in your community?",
+                  _surveyAnswersController,
+                ),
 
                 // Checkboxes
                 CheckboxListTile(
-                  title: Text('Allow SolveIT Labs to contact you'),
+                  title: Text('Allow Resolve Tech to contact you'),
                   value: _allowContact,
                   onChanged: (value) {
                     setState(() {
@@ -260,24 +311,36 @@ class _SubmitProblemScreenState extends State<SubmitProblemScreen> {
                     });
                   },
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 20),
 
                 // Submit Button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        // Submission logic
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text('Problem submitted successfully!')),
-                        );
-                      }
-                    },
-                    child: Text('Submit Problem'),
-                  ),
-                ),
+                _isLoading
+                    ? const CircularProgressIndicator()
+                    : SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              _submitProblem(context);
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF1F41BB),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          child: const Text(
+                            'Submit Problem',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
               ],
             ),
           ),
@@ -292,7 +355,6 @@ class _SubmitProblemScreenState extends State<SubmitProblemScreen> {
     _problemDescriptionController.dispose();
     _impactDescriptionController.dispose();
     _proposedSolutionController.dispose();
-    _technologyRoleController.dispose();
     _surveyAnswersController.dispose();
     super.dispose();
   }

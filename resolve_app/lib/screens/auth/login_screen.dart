@@ -20,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
+  // function to Check network connectivity (prod)
   Future<bool> _isNetworkConnected() async {
     try {
       final response = await http.get(Uri.parse('https://www.google.com'));
@@ -37,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _errorMessage = null;
     });
 
-    // Check network connectivity
+    // Check network connectivity: comment this block if you used dev `_baseUrl`
     final isConnected = await _isNetworkConnected();
     if (!isConnected && context.mounted) {
       setState(() {
@@ -54,6 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       return;
     }
+    // END Check network connectivity
 
     // Attempt login
     final result = await _authService.login(

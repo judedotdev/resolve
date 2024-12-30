@@ -1,4 +1,4 @@
-// middlewares/authMiddleware.js
+// ./middlewares/authMiddleware.js
 import { verifyToken } from '../utils/jwt.js';
 
 const authenticate = (req, res, next) => {

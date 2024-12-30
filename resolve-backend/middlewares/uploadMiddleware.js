@@ -1,4 +1,4 @@
-// middlewares/uploadMiddleware.js
+// ./middlewares/uploadMiddleware.js
 import multer from 'multer';
 import path from 'path';
 

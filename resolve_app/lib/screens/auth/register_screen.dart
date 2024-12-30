@@ -16,6 +16,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
+  // function to Check network connectivity (prod)
   Future<bool> _isNetworkConnected() async {
     try {
       final response = await http.get(Uri.parse('https://www.google.com'));
@@ -39,7 +40,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       _errorMessage = null;
     });
 
-    // Check network connectivity
+    // Check network connectivity: comment this block if you used dev `_baseUrl`
     final isConnected = await _isNetworkConnected();
     if (!isConnected && context.mounted) {
       setState(() {
@@ -56,6 +57,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       );
       return;
     }
+    // END Check network connectivity
 
     // Attempt register
     final result = await _authService.register(_formData);
@@ -248,7 +250,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 ),
                               ),
                               child: const Text(
-                                "Register",
+                                'Register',
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w600,

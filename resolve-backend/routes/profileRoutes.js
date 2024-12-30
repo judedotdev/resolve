@@ -1,4 +1,4 @@
-// routes/profileRoutes.js
+// ./routes/profileRoutes.js
 import express from 'express';
 import passport from 'passport';
 import bcrypt from 'bcrypt';

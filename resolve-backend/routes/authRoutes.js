@@ -1,4 +1,4 @@
-// routes/authRoutes.js
+// ./routes/authRoutes.js
 import express from 'express';
 import { check, validationResult } from 'express-validator';
 import passport from 'passport';

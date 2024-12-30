@@ -1,36 +1,24 @@
-// ./routes/problemRoutes.js
+// ./routes/uploadImage.js
 import express from 'express';
 import { authenticate, protect } from '../middlewares/authMiddleware.js';
 import Problem from '../models/Problem.js';
+import multer from 'multer';
 
 const router = express.Router();
 
-// Create a problem
-router.post('/', authenticate, async (req, res) => {
-  try {
-    const {
-      title,
-      problemDescription,
-      impactDescription,
-      suggestedSolution,
-      selectedIncentive,
-      extraInfo,
-      allowContact,
-      makePublic,
-    } = req.body;
+// Multer setup for image uploads
+const upload = multer({ dest: 'uploads/' });
 
+// Create a problem
+router.post('/', authenticate, upload.single('image'), async (req, res) => {
+  try {
+    const { description, suggestedSolution } = req.body;
     const problem = await Problem.create({
       userId: req.user.id,
-      title,
-      problemDescription,
-      impactDescription,
+      description,
       suggestedSolution,
-      selectedIncentive,
-      extraInfo,
-      allowContact,
-      makePublic,
+      image: req.file ? req.file.path : null,
     });
-
     res.status(201).json(problem);
   } catch (err) {
     res.status(500).json({ message: 'Error creating problem', error: err.message });
