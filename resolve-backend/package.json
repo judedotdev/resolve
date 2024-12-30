@@ -2,14 +2,12 @@
   "name": "resolve-backend",
   "version": "1.0.0",
   "description": "Backend for resolve Flutter App",
-  "main": "server.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "mocha './test/**/*.test.js'",
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "pm2": "npx pm2 start server.js --name resolve-api",
-    "start-app": "flutter run && nodemon server.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "author": "judedotdev",
   "license": "ISC",

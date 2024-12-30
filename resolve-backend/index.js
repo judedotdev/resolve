@@ -1,4 +1,4 @@
-// ./server.js
+// ./index.js
 import dotenv from 'dotenv';
 dotenv.config(); // Configuring dotenv
 import express from 'express';
