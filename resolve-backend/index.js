@@ -39,8 +39,13 @@ if (!fs.existsSync(uploadDir)) {
 
 // Routes
 app.get('/', (req, res) => {
-    res.redirect('/api'); // Redirect all requests to `/` to `/api`
+    console.log(`Server is running on http://${req.hostname}:${PORT}`);
+    res.status(200).send('Server Started Successfully!');
 });
+
+// app.get('/', (req, res) => {
+//     res.redirect('/api'); // Redirect all requests to `/` to `/api`
+// });
 
 // Route to handle `/api` and show a welcome message
 app.get('/api', (req, res) => {
@@ -60,9 +65,4 @@ export default app; // Safe and standard practice
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-
-    app.get('/', (req, res) => {
-        console.log(`Server is running on http://${req.hostname}:${PORT}`);
-        res.status(200).send('Server Started Successfully!');
-    });
 });

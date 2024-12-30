@@ -1,15 +1,17 @@
 {
+    "installCommand": "npm install",
+    "name": "resolve-api",
     "version": 2,
     "builds": [
         {
-            "src": "./server.js",
+            "src": "./index.js",
             "use": "@vercel/node"
         }
     ],
-    "routes": [
+    "rewrites": [
         {
-            "src": "/(.*)",
-            "dest": "/"
+            "source": "/(.*)",
+            "destination": "/"
         }
     ]
 }
