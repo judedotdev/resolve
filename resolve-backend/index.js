@@ -32,20 +32,22 @@ app.use(rateLimiter);
 connectDB();
 
 // Create the 'uploads' directory if it doesn't exist
-const uploadDir = path.join('/tmp', 'uploads');
+const uploadDir = process.env.NODE_ENV === 'production'
+    ? path.join('/tmp', 'uploads')   // For serverless environments (like Vercel)
+    : path.join(__dirname, 'uploads'); // For local development (on Windows, Linux, etc.)
 if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
+    fs.mkdirSync(uploadDir, { recursive: true });
 }
 
 // Routes
-app.get('/', (req, res) => {
-    console.log(`Server is running on http://${req.hostname}:${PORT}`);
-    res.status(200).send('Server Started Successfully!');
-});
-
 // app.get('/', (req, res) => {
-//     res.redirect('/api'); // Redirect all requests to `/` to `/api`
+//     console.log(`Server is running on http://${req.hostname}:${PORT}`);
+//     res.status(200).send('Server Started Successfully!');
 // });
+
+app.get('/', (req, res) => {
+    res.redirect('/api'); // Redirect all requests to `/` to `/api`
+});
 
 // Route to handle `/api` and show a welcome message
 app.get('/api', (req, res) => {
