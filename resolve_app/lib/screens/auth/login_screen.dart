@@ -19,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final AuthService _authService = AuthService();
   bool _isLoading = false;
   String? _errorMessage;
+  static const bool isProd = false; // set this to false for development env
 
   // function to Check network connectivity (prod)
   Future<bool> _isNetworkConnected() async {
@@ -38,9 +39,9 @@ class _LoginScreenState extends State<LoginScreen> {
       _errorMessage = null;
     });
 
-    // Check network connectivity: comment this block if you used dev `_baseUrl`
+    // Check network connectivity
     final isConnected = await _isNetworkConnected();
-    if (!isConnected && context.mounted) {
+    if (!isConnected && context.mounted && isProd) {
       setState(() {
         _isLoading = false;
       });

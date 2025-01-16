@@ -15,6 +15,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final Map<String, String> _formData = {};
   bool _isLoading = false;
   String? _errorMessage;
+  static const bool isProd = false; // set this to false for development env
 
   // function to Check network connectivity (prod)
   Future<bool> _isNetworkConnected() async {
@@ -42,7 +43,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
     // Check network connectivity: comment this block if you used dev `_baseUrl`
     final isConnected = await _isNetworkConnected();
-    if (!isConnected && context.mounted) {
+    if (!isConnected && context.mounted && isProd) {
       setState(() {
         _isLoading = false;
       });

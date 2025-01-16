@@ -4,8 +4,10 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthService {
-  // static const String _baseUrl = 'http://localhost:5000/api'; // dev
-  static const String _baseUrl = 'https://resolve-api.vercel.app/api'; // prod
+  static const bool isProd = false; // set this to false for development env
+  static const String _baseUrl = isProd
+      ? 'https://resolve-api.vercel.app/api' // prod
+      : 'http://localhost:5000/api'; // dev
   final _storage = const FlutterSecureStorage();
 
   Future<Map<String, dynamic>> register(Map<String, String> userData) async {

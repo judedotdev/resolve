@@ -38,6 +38,7 @@ class _SubmitProblemScreenState extends State<SubmitProblemScreen> {
   final AuthService _authService = AuthService(); // Instance of AuthService
   bool _isLoading = false;
   String? _errorMessage;
+  static const bool isProd = false; // set this to false for development env
 
   // function to Check network connectivity (prod)
   Future<bool> _isNetworkConnected() async {
@@ -70,7 +71,7 @@ class _SubmitProblemScreenState extends State<SubmitProblemScreen> {
 
     // Check network connectivity: comment this block if you used dev `_baseUrl`
     final isConnected = await _isNetworkConnected();
-    if (!isConnected && context.mounted) {
+    if (!isConnected && context.mounted && isProd) {
       setState(() {
         _isLoading = false;
       });
